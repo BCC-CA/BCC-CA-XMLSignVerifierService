@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using System.Xml;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using XmlSigner.Library.Model;
+using XMLSigner.Library;
 
 namespace SinedXmlVelidator.Controllers
 {
     //[Route("api/[controller]")]
     [Route("/")]
     [ApiController]
+    [EnableCors]
     public class XmlValidatorController : ControllerBase
     {
         private readonly ILogger<XmlValidatorController> _logger;
@@ -25,19 +28,71 @@ namespace SinedXmlVelidator.Controllers
         public ActionResult Get()
         {
             _logger.LogDebug("Application Home Page Accessed");
-            return Ok(new
-            {
+            return Ok(new {
                 status = "XML Signature Verifier Is Running",
                 currentTime = DateTime.UtcNow,
                 os = System.Runtime.InteropServices.RuntimeInformation.OSDescription
             });
         }
 
-        // POST api/<XmlValidatorController>
-        [HttpPost]
-        public string Post([FromBody] string value)
+        [HttpPost("verify_file")]
+        public async Task<ActionResult<ICollection<Certificate>>> VerifyFile([FromForm] IFormFile file)    //XmlFile xmlFile
         {
-            return value;
+            if (file.Length > 0)
+            {
+                string contentString = await Adapter.ReadAsStringAsync(file);
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.LoadXml(contentString);
+                bool hasAnySignature = true;
+                List<Certificate> certificates = GetValidatedCertificates(xmlDoc, out hasAnySignature);
+                return certificates;
+                //return null;
+            }
+            else
+            {
+                return BadRequest("A file Should be Uploaded");
+            }
+        }
+
+        [HttpPost("verify_string")]
+        public ActionResult<ICollection<Certificate>> VerifyXmlString([FromQuery(Name = "xml")] string xml)
+        //string xml                                => Giving Null
+        //[FromQuery(Name = "xml")] string xml      => Giving Null
+        //[FromBody] string xml                     => Unsupported Media Type - 415
+        //[FromBody] dynamic xml                    => Unsupported Media Type - 415
+        //HttpRequestMessage msg                    => Unsupported Media Type - 415
+        {
+            if (xml == null)
+            {
+                return BadRequest("XML Should Not be empty");
+            }
+            if (xml.Length>0)
+            {
+                return BadRequest("A file Should be Uploaded");
+            }
+            else
+            {
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.LoadXml(xml);
+                bool hasAnySignature = true;
+                List<Certificate> certificates = GetValidatedCertificates(xmlDoc, out hasAnySignature);
+                return certificates;
+            }
+        }
+
+        private List<Certificate> GetValidatedCertificates(XmlDocument xmlDoc, out bool hasAnySignature)
+        {
+            /*
+            hasAnySignature = 
+            if (hasAnySignature)
+            {
+                return BadRequest("A file Should be Uploaded");
+            }
+            else
+            { }
+            */
+
+            throw new NotImplementedException();
         }
     }
 }
