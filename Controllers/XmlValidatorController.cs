@@ -41,10 +41,8 @@ namespace SinedXmlVelidator.Controllers
             if (file?.Length > 0)
             {
                 string contentString = await Adapter.ReadAsStringAsync(file);
-                XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.LoadXml(contentString);
                 bool hasAnySignature = true;
-                List<Certificate> certificates = GetValidatedCertificates(xmlDoc, out hasAnySignature);
+                List<Certificate> certificates = GetValidatedCertificates(contentString, out hasAnySignature);
                 return certificates;
                 //return null;
             }
@@ -58,40 +56,22 @@ namespace SinedXmlVelidator.Controllers
         public ActionResult<ICollection<Certificate>> VerifyXmlString([FromForm] string xml)
         {
             //string xml = Request.Form["xml"];
-            if (xml?.Length > 0)
+            if (xml?.Length == 0)
             {
                 return BadRequest("A file Should be Uploaded");
             }
             else
             {
-                XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.LoadXml(xml);
                 bool hasAnySignature = true;
-                List<Certificate> certificates = GetValidatedCertificates(xmlDoc, out hasAnySignature);
+                List<Certificate> certificates = GetValidatedCertificates(xml, out hasAnySignature);
                 return certificates;
             }
         }
 
-        //[HttpPost("verify_file")]
-        //public ActionResult<ICollection<Certificate>> VerifyXmlFile([FromForm] string xml)
-        //{
-        //    //string xml = Request.Form["xml"];
-        //    if (xml?.Length > 0)
-        //    {
-        //        return BadRequest("A file Should be Uploaded");
-        //    }
-        //    else
-        //    {
-        //        XmlDocument xmlDoc = new XmlDocument();
-        //        xmlDoc.LoadXml(xml);
-        //        bool hasAnySignature = true;
-        //        List<Certificate> certificates = GetValidatedCertificates(xmlDoc, out hasAnySignature);
-        //        return certificates;
-        //    }
-        //}
-
-        private List<Certificate> GetValidatedCertificates(XmlDocument xmlDoc, out bool hasAnySignature)
+        private List<Certificate> GetValidatedCertificates(string xml, out bool hasAnySignature)
         {
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(xml);
             /*
             hasAnySignature = 
             if (hasAnySignature)
