@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SinedXmlVelidator.Models;
 using XmlSigner.Library.Model;
 using XMLSigner.Library;
 
@@ -36,7 +37,7 @@ namespace SinedXmlVelidator.Controllers
         }
 
         [HttpPost("verify_file")]
-        public async Task<ActionResult<ICollection<Certificate>>> VerifyFile([FromForm] IFormFile file)    //XmlFile xmlFile
+        public async Task<ActionResult<ICollection<Certificate>>> VerifyFile([FromForm]IFormFile file)    //XmlFile xmlFile
         {
             if (file.Length > 0)
             {
@@ -55,18 +56,19 @@ namespace SinedXmlVelidator.Controllers
         }
 
         [HttpPost("verify_string")]
-        public ActionResult<ICollection<Certificate>> VerifyXmlString([FromQuery(Name = "xml")] string xml)
-        //string xml                                => Giving Null
-        //[FromQuery(Name = "xml")] string xml      => Giving Null
-        //[FromBody] string xml                     => Unsupported Media Type - 415
-        //[FromBody] dynamic xml                    => Unsupported Media Type - 415
-        //HttpRequestMessage msg                    => Unsupported Media Type - 415
+        public ActionResult<ICollection<Certificate>> VerifyXmlString([FromForm]string xml)
         {
-            if (xml == null)
-            {
-                return BadRequest("XML Should Not be empty");
-            }
-            if (xml.Length>0)
+            //if (ModelState.IsValid)
+            //{
+            //    return BadRequest("XML Should Not be empty");
+            //}
+            //if (model == null)
+            //{
+            //    return BadRequest("XML Should Not be empty");
+            //}
+            //string xml = model.xml;
+            //string xml = Request.Form["xml"];
+            if (xml?.Length>0)
             {
                 return BadRequest("A file Should be Uploaded");
             }
