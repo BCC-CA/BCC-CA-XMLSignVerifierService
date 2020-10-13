@@ -5,14 +5,14 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Xml;
-using XmlSigner.Library.Model;
+using XmlSigner.Library.Models;
 using DataObject = System.Security.Cryptography.Xml.DataObject;
 
 namespace XMLSigner.Library
 {
     class XmlSign
     {
-        private static bool CheckIfDocumentPreviouslySigned(XmlDocument xmlDocument)
+        internal static bool CheckIfDocumentPreviouslySigned(XmlDocument xmlDocument)
         {
             int signCount = DocumentSignCount(xmlDocument);
             if (signCount > 0)
@@ -264,11 +264,11 @@ namespace XMLSigner.Library
             return selectedCert[0];
         }
 
-        internal static List<Certificate> GetAllSign(XmlDocument xmlDocument)
+        internal static List<CertificateModel> GetAllSign(XmlDocument xmlDocument)
         {
             if (!CheckIfDocumentPreviouslySigned(xmlDocument))
                 return null;
-            List<Certificate> signerCertificateList = new List<Certificate>();
+            List<CertificateModel> signerCertificateList = new List<CertificateModel>();
 
             while (CheckIfDocumentPreviouslySigned(xmlDocument))
             {
@@ -286,19 +286,26 @@ namespace XMLSigner.Library
             return signerCertificateList;
         }
 
-        internal static XmlDocument GetRealXmlDocument(XmlDocument xmlDocument)
+        internal static XmlDocument GetRealXmlDocument(XmlDocument xmlDoc)
         {
+            XmlDocument xmlDocument = new XmlDocument();
+            xmlDocument.LoadXml(xmlDoc.OuterXml);
             XmlNodeList nodeList = xmlDocument.GetElementsByTagName("Signature");
-            foreach (XmlNode node in nodeList)
+            for (int i = nodeList.Count - 1; i > -1; i--)
             {
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-                node.ParentNode.RemoveChild(node);
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
+                try
+                {
+                    nodeList[i].ParentNode.RemoveChild(nodeList[i]);
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
             }
             return xmlDocument;
         }
 
-        private static Certificate GetLastSignerCertificateModel(XmlDocument xmlDocument)
+        private static CertificateModel GetLastSignerCertificateModel(XmlDocument xmlDocument)
         {
             if (!CheckIfDocumentPreviouslySigned(xmlDocument))
             {
@@ -318,7 +325,7 @@ namespace XMLSigner.Library
             string timeString = document.GetElementsByTagName("Reference")[0].Attributes["Id"].Value;
             /*...Decode text in cert here (may need to use Encoding, Base64, UrlEncode, etc) ending with 'data' being a byte array...*/
             X509Certificate2 certificate = new X509Certificate2(Encoding.ASCII.GetBytes(certString));
-            return new Certificate(certificate, timeString);
+            return new CertificateModel(certificate, timeString);
         }
     }
 }

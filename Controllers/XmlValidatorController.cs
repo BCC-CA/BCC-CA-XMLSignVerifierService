@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Xml;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using XmlSigner.Library.Model;
+using SinedXmlVelidator.Library;
+using XmlSigner.Library.Models;
 using XMLSigner.Library;
 
 namespace SinedXmlVelidator.Controllers
@@ -36,15 +35,18 @@ namespace SinedXmlVelidator.Controllers
         }
 
         [HttpPost("verify_file")]
-        public async Task<ActionResult<ICollection<Certificate>>> VerifyFile([FromForm]IFormFile file)    //XmlFile xmlFile
+        public async Task<ActionResult<SignedXmlModel>> VerifyFile([FromForm]IFormFile file)    //XmlFile xmlFile
         {
             if (file?.Length > 0)
             {
+                _logger.LogDebug("File Name - " + file.FileName);
                 string contentString = await Adapter.ReadAsStringAsync(file);
-                bool hasAnySignature = true;
-                List<Certificate> certificates = GetValidatedCertificates(contentString, out hasAnySignature);
-                return certificates;
-                //return null;
+                SignedXmlModel signedXml = Utility.GetSignedXmlModel(contentString);
+                if(signedXml == null)
+                {
+                    return BadRequest("File was modified");
+                }
+                return signedXml;
             }
             else
             {
@@ -53,7 +55,7 @@ namespace SinedXmlVelidator.Controllers
         }
 
         [HttpPost("verify_string")]
-        public ActionResult<ICollection<Certificate>> VerifyXmlString([FromForm] string xml)
+        public ActionResult<SignedXmlModel> VerifyXmlString([FromForm] string xml)
         {
             //string xml = Request.Form["xml"];
             if (xml?.Length == 0)
@@ -62,27 +64,13 @@ namespace SinedXmlVelidator.Controllers
             }
             else
             {
-                bool hasAnySignature = true;
-                List<Certificate> certificates = GetValidatedCertificates(xml, out hasAnySignature);
-                return certificates;
+                SignedXmlModel signedXml = Utility.GetSignedXmlModel(xml);
+                if (signedXml == null)
+                {
+                    return BadRequest("File was modified");
+                }
+                return signedXml;
             }
-        }
-
-        private List<Certificate> GetValidatedCertificates(string xml, out bool hasAnySignature)
-        {
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(xml);
-            /*
-            hasAnySignature = 
-            if (hasAnySignature)
-            {
-                return BadRequest("A file Should be Uploaded");
-            }
-            else
-            { }
-            */
-
-            throw new NotImplementedException();
         }
     }
 }

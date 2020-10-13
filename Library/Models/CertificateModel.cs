@@ -2,11 +2,11 @@
 using System.Security.Cryptography.X509Certificates;
 using XMLSigner.Library;
 
-namespace XmlSigner.Library.Model
+namespace XmlSigner.Library.Models
 {
-    public class Certificate
+    public class CertificateModel
     {
-        public Certificate(X509Certificate2 certificate, string timeString)
+        public CertificateModel(X509Certificate2 certificate, string timeString)
         {
             ValidFrom = certificate.NotBefore;
             ValidTo = certificate.NotAfter;
