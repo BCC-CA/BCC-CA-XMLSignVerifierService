@@ -312,13 +312,9 @@ namespace XMLSigner.Library
                 return null;
             }
             XmlDocument document = new XmlDocument();
-
-            // Find the "Signature" node and create a new
-            // XmlNodeList object.
             XmlNodeList nodeList = xmlDocument.GetElementsByTagName("Signature");
 
-            // Load the signature node.
-
+            // Load the last signature node.
             document.LoadXml(((XmlElement)nodeList[nodeList.Count - 1]).OuterXml);
             string certString = document.GetElementsByTagName("X509Data")[0].InnerText;
             //var timeString = Adapter.Base64DecodTime(document.GetElementsByTagName("Reference")[0].InnerText);

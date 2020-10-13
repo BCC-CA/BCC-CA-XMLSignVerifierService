@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Xml;
 using XmlSigner.Library.Models;
 using XMLSigner.Library;
@@ -17,7 +16,7 @@ namespace SinedXmlVelidator.Library
             signedXml.xml = GetXmlStringBeforeSigning(xmlDoc, out hasAnySignature);
             if (hasAnySignature)
             {
-                List<CertificateModel> certs = GetValidatedCertificates(xmlDoc);
+                List<CertificateModel> certs = XmlSign.GetAllSign(xmlDoc);
                 if (certs == null)
                 {
                     return null;
@@ -32,11 +31,6 @@ namespace SinedXmlVelidator.Library
             hasAnySignature = XmlSign.CheckIfDocumentPreviouslySigned(xmlDoc);
             XmlDocument basicXml = XmlSign.GetRealXmlDocument(xmlDoc);
             return basicXml.OuterXml;
-        }
-
-        private static List<CertificateModel> GetValidatedCertificates(XmlDocument xml)
-        {
-            throw new NotImplementedException();
         }
     }
 }
