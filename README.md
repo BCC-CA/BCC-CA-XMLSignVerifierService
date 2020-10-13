@@ -50,6 +50,8 @@ Now make the service up and running-
 
 Now allow the `5050` port from `iptable`, `network`, `firewall` and `selinux`.
 
+    sudo firewall-cmd --zone=public --add-port=5050/tcp --permanent && sudo firewall-cmd --reload && netstat -tulnp
+
 ## Demo Commands For Update Project-
 
     cd /home/abrar/XML-Signer-ASP.NetCore-PostGRE && git pull && sudo systemctl stop supervisord && rm -rf /home/abrar/PublishedWebApp && dotnet publish -c Release -o /home/abrar/PublishedWebApp && sudo systemctl start supervisord && cd ~ && tail -f /var/log/xml_sign_verifier_service.out.log
