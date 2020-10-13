@@ -21,7 +21,7 @@ namespace SinedXmlVelidator.Library
                 {
                     return null;
                 }
-                signedXml.certificates = certs;
+                signedXml.signatures = certs;
             }
             return signedXml;
         }

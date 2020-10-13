@@ -8,17 +8,19 @@ namespace XmlSigner.Library.Models
     {
         public CertificateModel(X509Certificate2 certificate, string timeString)
         {
-            ValidFrom = certificate.NotBefore;
-            ValidTo = certificate.NotAfter;
-            Issuer = certificate.Issuer;
-            Subject = certificate.Subject;
+            CertificateValidFrom = certificate.NotBefore;
+            CertificateValidTo = certificate.NotAfter;
+            CertificateIssuer = certificate.Issuer;
+            CertificateSubject = certificate.Subject;
             SigningTime = (DateTime)Adapter.Base64DecodTime(timeString);
+            tsaSignedTimestamp_Base64_UTF8 = timeString;
         }
 
-        public DateTime ValidFrom { get; }
-        public DateTime ValidTo { get; }
-        public string Issuer { get; }
-        public string Subject { get; }
+        public DateTime CertificateValidFrom { get; }
+        public DateTime CertificateValidTo { get; }
+        public string CertificateIssuer { get; }
+        public string CertificateSubject { get; }
         public DateTime SigningTime { get; }
+        public string tsaSignedTimestamp_Base64_UTF8 { get; }
     }
 }
