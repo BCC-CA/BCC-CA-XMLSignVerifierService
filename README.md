@@ -38,9 +38,8 @@ Save and quit:
 
 And run this command to make the app files-
 
-    cd ~ && git clone https://github.com/AbrarJahin/BCC-CA-XMLSignVerifierService.git && sudo systemctl stop supervisord && rm -rf ~/PublishedXmlVerifireService && cd BCC-CA-XMLSignVerifierService && dotnet publish -c Release -o ~/PublishedXmlVerifireService
-    
-    sudo systemctl start supervisord && cd ~ && tail -f /var/log/dotnetWebApp.out.log
+    cd ~ && git clone https://github.com/AbrarJahin/BCC-CA-XMLSignVerifierService.git && sudo systemctl stop supervisord && rm -rf ~/PublishedXmlVerifireService && cd BCC-CA-XMLSignVerifierService && dotnet publish -c Release -o ~/PublishedXmlVerifireService && cd ~
+    sudo systemctl start supervisord && cd ~ && tail -f /var/log/xml_sign_verifier_service.out.log
 
 Now make the service up and running-
 
@@ -53,5 +52,5 @@ Now allow the `5050` port from `iptable`, `network`, `firewall` and `selinux`.
 
 ## Demo Commands For Update Project-
 
-    cd /home/abrar/XML-Signer-ASP.NetCore-PostGRE && git pull && sudo systemctl stop supervisord && rm -rf /home/abrar/PublishedWebApp && dotnet publish -c Release -o /home/abrar/PublishedWebApp && sudo systemctl start supervisord && cd ~ && tail -f /var/log/dotnetWebApp.out.log
+    cd /home/abrar/XML-Signer-ASP.NetCore-PostGRE && git pull && sudo systemctl stop supervisord && rm -rf /home/abrar/PublishedWebApp && dotnet publish -c Release -o /home/abrar/PublishedWebApp && sudo systemctl start supervisord && cd ~ && tail -f /var/log/xml_sign_verifier_service.out.log
 
