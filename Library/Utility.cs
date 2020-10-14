@@ -26,19 +26,32 @@ namespace SinedXmlVelidator.Library
                 signedXml.error = "File is not a valid XML";
                 return signedXml;
             }
-            signedXml.xml = GetXmlStringBeforeSigning(xmlDoc, out hasAnySignature);
-            if (hasAnySignature)
+
+            try
             {
-                List<CertificateModel> certs = XmlSign.GetAllSign(xmlDoc);
-                if (certs == null)
+                signedXml.xml = GetXmlStringBeforeSigning(xmlDoc, out hasAnySignature);
+                if (hasAnySignature)
                 {
-                    signedXml.success = false;
-                    signedXml.error = "File was modified";
-                    signedXml.xml = null;
-                    signedXml.signatures = null;
-                    return signedXml;
+                    List<CertificateModel> certs = XmlSign.GetAllSign(xmlDoc);
+                    if (certs == null)
+                    {
+                        signedXml.success = false;
+                        signedXml.error = "File was modified";
+                        signedXml.xml = null;
+                        signedXml.signatures = null;
+                        return signedXml;
+                    }
+                    signedXml.signatures = certs;
                 }
-                signedXml.signatures = certs;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
+                signedXml.success = false;
+                signedXml.error = "Unknown Exception, Please check log File of XML Verifire Service";
+                signedXml.xml = null;
+                signedXml.signatures = null;
+                return signedXml;
             }
             return signedXml;
         }
