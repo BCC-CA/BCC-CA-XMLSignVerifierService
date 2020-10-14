@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SinedXmlVelidator.Library;
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -29,28 +30,6 @@ namespace XMLSigner.Library
         {
             XmlNodeList nodeList = xmlDocument.GetElementsByTagName("Signature");
             return nodeList.Count;
-        }
-
-        internal static bool? VerifyAllSign(XmlDocument xmlDocument)
-        {
-            if (!CheckIfDocumentPreviouslySigned(xmlDocument))
-                return null;    //File has no sign
-            while (CheckIfDocumentPreviouslySigned(xmlDocument))
-            {
-                bool? lastSignVerificationStatus = VerifyLastSign(xmlDocument);
-                if (lastSignVerificationStatus == false)
-                {
-                    return false;   //Not counting all sign, find first invalid sign and tell that file is invalid
-                }
-                string id = GetLastSignatureId(xmlDocument);
-                //Update xmlDocument by removing last sign tag
-                xmlDocument = RemoveLastSign(xmlDocument);
-                if (Tsa.ValidateTimestamp(xmlDocument, id) == false)
-                {
-                    return false;   //The TSA signature is invalid
-                }
-            }
-            return true;
         }
 
         private static XmlDocument RemoveLastSign(XmlDocument xmlDocument)
@@ -94,10 +73,6 @@ namespace XMLSigner.Library
                 // Load the signature node.
                 signedXml.LoadXml((XmlElement)nodeList[nodeList.Count - 1]);
 
-                //////////////////////////////////Extract key - Start
-                X509Certificate2 x509 = GetLastSignerCertificate(xmlDocument);
-                //////////////////////////////////Extract key - End
-
                 AsymmetricAlgorithm key;
                 bool signatureCheckStatus = signedXml.CheckSignatureReturningKey(out key);
                 if (signatureCheckStatus)
@@ -119,149 +94,10 @@ namespace XMLSigner.Library
             }
         }
 
-        private static X509Certificate2 GetLastSignerCertificate(XmlDocument xmlDocument)
-        {
-            if (!CheckIfDocumentPreviouslySigned(xmlDocument))
-            {
-                return null;
-            }
-            XmlDocument document = new XmlDocument();
-
-            // Find the "Signature" node and create a new
-            // XmlNodeList object.
-            XmlNodeList nodeList = xmlDocument.GetElementsByTagName("Signature");
-
-            // Load the signature node.
-
-            document.LoadXml(((XmlElement)nodeList[nodeList.Count - 1]).OuterXml);
-            string certString = document.GetElementsByTagName("X509Data")[0].InnerText;
-            /*...Decode text in cert here (may need to use Encoding, Base64, UrlEncode, etc) ending with 'data' being a byte array...*/
-            return new X509Certificate2(Encoding.ASCII.GetBytes(certString));
-        }
-
-        private static string GetLastSignatureId(XmlDocument xmlDocument)
-        {
-            if (!CheckIfDocumentPreviouslySigned(xmlDocument))
-            {
-                return null;
-            }
-            XmlNodeList nodeList = xmlDocument.GetElementsByTagName("Signature");
-            XmlDocument document = new XmlDocument();
-            document.LoadXml(((XmlElement)nodeList[nodeList.Count - 1]).OuterXml);
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml(document.GetElementsByTagName("Reference")[0].OuterXml);
-            return doc.DocumentElement.Attributes["Id"].Value;
-        }
-
         private static bool VerifyMetaDataObjectSignature(XmlElement metaXmlElement, AsymmetricAlgorithm ExtractedKey)
         {
             return true;
             throw new NotImplementedException();
-        }
-
-        private static string Base64EncodedCurrentTime(DateTime? time)
-        {
-            if (time == null)
-            {
-                time = DateTime.UtcNow;
-            }
-            byte[] plainTextBytes = Encoding.UTF8.GetBytes(((DateTime)time).ToString());
-            return Convert.ToBase64String(plainTextBytes);
-        }
-
-        private static DateTime Base64DecodTime(string encodedTimeString)
-        {
-            byte[] base64EncodedBytes = Convert.FromBase64String(encodedTimeString);
-            return DateTime.Parse(Encoding.UTF8.GetString(base64EncodedBytes));
-        }
-
-        private static DataObject CreateMetaDataObject(long uniqueId, string reason)
-        {
-            //https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509certificate2.import?view=netframework-4.8
-            //Should add a sign with it also so that it can be proven that data is not tempered and should add verifire for it also
-            DataObject dataObject = new DataObject();
-            XmlDocument xmlDoc = new XmlDocument();
-            XmlNode root = xmlDoc.AppendChild(xmlDoc.CreateElement("meta", "meta-data"));
-
-            XmlNode child1 = root.AppendChild(xmlDoc.CreateElement("unique", "unique-id"));
-            XmlAttribute childAtt1 = child1.Attributes.Append(xmlDoc.CreateAttribute("server-unique"));
-            //childAtt1.InnerText = uniqueId.ToString();
-            child1.InnerText = uniqueId.ToString();
-
-            XmlNode child2 = root.AppendChild(xmlDoc.CreateElement("signing-reason", "signing-local-time"));
-            XmlAttribute childAtt2 = child2.Attributes.Append(xmlDoc.CreateAttribute("local-time"));
-            childAtt2.InnerText = DateTime.Now.ToString();          //Local Time
-            child2.InnerText = reason;    //Server Time
-
-            //Sign Meta Data and store without key
-            //xmlDoc = GetSignedMetaData(xmlDoc, certificate);
-
-            dataObject.Data = xmlDoc.ChildNodes;
-            dataObject.Id = Base64EncodedCurrentTime(null);// new Random().Next().ToString();
-            return dataObject;
-        }
-
-        private static XmlDocument GetSignedMetaData(XmlDocument xmlDocument, X509Certificate2 certificate)
-        {
-            SignedXml signedXml = new SignedXml(xmlDocument);
-            signedXml.SigningKey = certificate.PrivateKey;
-
-            // Create a reference to be signed.
-            Reference reference = new Reference();
-            reference.Uri = "";
-
-            // Add an enveloped transformation to the reference.            
-            XmlDsigEnvelopedSignatureTransform env =
-               new XmlDsigEnvelopedSignatureTransform(true);
-            reference.AddTransform(env);
-
-            //canonicalize
-            XmlDsigC14NTransform c14t = new XmlDsigC14NTransform();
-            reference.AddTransform(c14t);
-
-            // Add the reference to the SignedXml object.
-            signedXml.AddReference(reference);
-
-            // Compute the signature.
-            signedXml.ComputeSignature();
-
-            // Get the XML representation of the signature and save 
-            // it to an XmlElement object.
-            XmlElement xmlDigitalSignature = signedXml.GetXml();
-
-            xmlDocument.DocumentElement.AppendChild(
-                xmlDocument.ImportNode(xmlDigitalSignature, true));
-
-            return xmlDocument;
-        }
-
-        internal static X509Certificate2 GetX509Certificate2FromDongle()
-        {
-            List<X509Certificate2> certList = new List<X509Certificate2>();
-            using (X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
-            {
-                store.Open(OpenFlags.ReadOnly);
-                foreach (X509Certificate2 cert in (X509Certificate2Collection)store.Certificates)
-                {
-                    //Filter for not showing unnecessery certificates
-                    if (
-                        cert.HasPrivateKey
-                        && !cert.Issuer.Contains("localhost")
-                        && (cert.NotAfter >= DateTime.Now && cert.NotBefore <= DateTime.Now)
-                        )
-                    {
-                        certList.Add(cert);
-                    }
-                }
-                store.Close(); //No Need
-            }
-            X509Certificate2Collection selectedCert = X509Certificate2UI.SelectFromCollection(
-                    new X509Certificate2Collection(certList.ToArray()),
-                    "Digital Document Signer",
-                    "Please Select a Certificate for Signing Document",
-                    X509SelectionFlag.SingleSelection
-                );
-            return selectedCert[0];
         }
 
         internal static List<CertificateModel> GetAllSign(XmlDocument xmlDocument)
@@ -321,6 +157,7 @@ namespace XMLSigner.Library
             string timeString = document.GetElementsByTagName("Reference")[0].Attributes["Id"].Value;
             /*...Decode text in cert here (may need to use Encoding, Base64, UrlEncode, etc) ending with 'data' being a byte array...*/
             X509Certificate2 certificate = new X509Certificate2(Encoding.ASCII.GetBytes(certString));
+            var cert = Utility.GetCertificateFromString(certString);
             return new CertificateModel(certificate, timeString);
         }
     }

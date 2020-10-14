@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Org.BouncyCastle.X509;
+using System.Collections.Generic;
+using System.Text;
 using System.Xml;
 using XmlSigner.Library.Models;
 using XMLSigner.Library;
@@ -31,6 +33,13 @@ namespace SinedXmlVelidator.Library
             hasAnySignature = XmlSign.CheckIfDocumentPreviouslySigned(xmlDoc);
             XmlDocument basicXml = XmlSign.GetRealXmlDocument(xmlDoc);
             return basicXml.OuterXml;
+        }
+
+        internal static X509Certificate GetCertificateFromString(string certString)
+        {
+            X509CertificateParser certParser = new X509CertificateParser();
+            var b = Encoding.ASCII.GetBytes(certString);
+            return certParser.ReadCertificate(b);
         }
     }
 }
