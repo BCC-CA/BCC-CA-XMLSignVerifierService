@@ -42,15 +42,22 @@ namespace SinedXmlVelidator.Controllers
                 _logger.LogDebug("File Name - " + file.FileName);
                 string contentString = await Adapter.ReadAsStringAsync(file);
                 SignedXmlModel signedXml = Utility.GetSignedXmlModel(contentString);
-                if(signedXml == null)
+                if(signedXml.success == false)
                 {
-                    return BadRequest("File was modified");
+                    return BadRequest(signedXml);
                 }
-                return signedXml;
+                else
+                {
+                    return signedXml;
+                }
+                
             }
             else
             {
-                return BadRequest("A file Should be Uploaded");
+                SignedXmlModel signedXml = new SignedXmlModel();
+                signedXml.error = "A file Should be Uploaded";
+                signedXml.success = false;
+                return BadRequest(signedXml);
             }
         }
 
@@ -60,16 +67,22 @@ namespace SinedXmlVelidator.Controllers
             //string xml = Request.Form["xml"];
             if (xml?.Length == 0)
             {
-                return BadRequest("A file Should be Uploaded");
+                SignedXmlModel signedXml = new SignedXmlModel();
+                signedXml.error = "A xml string should be uploaded";
+                signedXml.success = false;
+                return BadRequest(signedXml);
             }
             else
             {
                 SignedXmlModel signedXml = Utility.GetSignedXmlModel(xml);
-                if (signedXml == null)
+                if (signedXml.success == false)
                 {
-                    return BadRequest("File was modified");
+                    return BadRequest(signedXml);
                 }
-                return signedXml;
+                else
+                {
+                    return signedXml;
+                }
             }
         }
     }

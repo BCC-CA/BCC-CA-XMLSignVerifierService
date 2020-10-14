@@ -1,5 +1,6 @@
 ﻿using Org.BouncyCastle.Utilities.Encoders;
 using Org.BouncyCastle.X509;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
@@ -15,14 +16,27 @@ namespace SinedXmlVelidator.Library
             SignedXmlModel signedXml = new SignedXmlModel();
             bool hasAnySignature;
             XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(contentString);
+            try {
+                xmlDoc.LoadXml(contentString);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
+                signedXml.success = false;
+                signedXml.error = "File is not a valid XML";
+                return signedXml;
+            }
             signedXml.xml = GetXmlStringBeforeSigning(xmlDoc, out hasAnySignature);
             if (hasAnySignature)
             {
                 List<CertificateModel> certs = XmlSign.GetAllSign(xmlDoc);
                 if (certs == null)
                 {
-                    return null;
+                    signedXml.success = false;
+                    signedXml.error = "File was modified";
+                    signedXml.xml = null;
+                    signedXml.signatures = null;
+                    return signedXml;
                 }
                 signedXml.signatures = certs;
             }
