@@ -26,7 +26,6 @@ namespace SinedXmlVelidator.Library
                 signedXml.error = "File is not a valid XML";
                 return signedXml;
             }
-
             try
             {
                 signedXml.xml = GetXmlStringBeforeSigning(xmlDoc, out hasAnySignature);
@@ -43,6 +42,7 @@ namespace SinedXmlVelidator.Library
                     }
                     signedXml.signatures = certs;
                 }
+                return signedXml;
             }
             catch(Exception ex)
             {
@@ -53,7 +53,6 @@ namespace SinedXmlVelidator.Library
                 signedXml.signatures = null;
                 return signedXml;
             }
-            return signedXml;
         }
 
         private static string GetXmlStringBeforeSigning(XmlDocument xmlDoc, out bool hasAnySignature)
