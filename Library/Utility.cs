@@ -1,4 +1,5 @@
-﻿using Org.BouncyCastle.X509;
+﻿using Org.BouncyCastle.Utilities.Encoders;
+using Org.BouncyCastle.X509;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
@@ -38,8 +39,8 @@ namespace SinedXmlVelidator.Library
         internal static X509Certificate GetCertificateFromString(string certString)
         {
             X509CertificateParser certParser = new X509CertificateParser();
-            var b = Encoding.ASCII.GetBytes(certString);
-            return certParser.ReadCertificate(b);
+            byte[] encodedByteArray = Base64.Decode(certString);
+            return (X509Certificate)certParser.ReadCertificate(encodedByteArray);
         }
     }
 }

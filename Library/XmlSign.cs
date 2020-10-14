@@ -2,12 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
-using System.Text;
 using System.Xml;
 using XmlSigner.Library.Models;
-using DataObject = System.Security.Cryptography.Xml.DataObject;
 
 namespace XMLSigner.Library
 {
@@ -156,9 +153,9 @@ namespace XMLSigner.Library
             //var timeString = Adapter.Base64DecodTime(document.GetElementsByTagName("Reference")[0].InnerText);
             string timeString = document.GetElementsByTagName("Reference")[0].Attributes["Id"].Value;
             /*...Decode text in cert here (may need to use Encoding, Base64, UrlEncode, etc) ending with 'data' being a byte array...*/
-            X509Certificate2 certificate = new X509Certificate2(Encoding.ASCII.GetBytes(certString));
+            //X509Certificate2 certificate = new X509Certificate2(Encoding.ASCII.GetBytes(certString));
             var cert = Utility.GetCertificateFromString(certString);
-            return new CertificateModel(certificate, timeString);
+            return new CertificateModel(cert, timeString);
         }
     }
 }
