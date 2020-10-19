@@ -50,7 +50,6 @@ namespace SinedXmlVelidator.Controllers
                 {
                     return signedXml;
                 }
-                
             }
             else
             {

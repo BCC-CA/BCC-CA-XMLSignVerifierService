@@ -68,5 +68,11 @@ namespace SinedXmlVelidator.Library
             byte[] encodedByteArray = Base64.Decode(certString);
             return (X509Certificate)certParser.ReadCertificate(encodedByteArray);
         }
+
+        internal static DateTime GetLocalTimeFromUtcTime(DateTime utcTime)
+        {
+            TimeZoneInfo tzinfo = TimeZoneInfo.Local;
+            return TimeZoneInfo.ConvertTimeFromUtc(utcTime, tzinfo);
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using SinedXmlVelidator.Library;
+﻿using Org.BouncyCastle.X509;
+using SinedXmlVelidator.Library;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -151,11 +152,11 @@ namespace XMLSigner.Library
             document.LoadXml(((XmlElement)nodeList[nodeList.Count - 1]).OuterXml);
             string certString = document.GetElementsByTagName("X509Data")[0].InnerText;
             //var timeString = Adapter.Base64DecodTime(document.GetElementsByTagName("Reference")[0].InnerText);
-            string timeString = document.GetElementsByTagName("Reference")[0].Attributes["Id"].Value;
-            /*...Decode text in cert here (may need to use Encoding, Base64, UrlEncode, etc) ending with 'data' being a byte array...*/
-            //X509Certificate2 certificate = new X509Certificate2(Encoding.ASCII.GetBytes(certString));
-            var cert = Utility.GetCertificateFromString(certString);
-            return new CertificateModel(cert, timeString);
+            string tsaTimeString = document.GetElementsByTagName("Reference")[0].Attributes["Id"].Value;
+            string signingLocalPcTime = document.GetElementsByTagName("signing-reason")[0].Attributes["local-time"].Value;
+            string signingReason = document.GetElementsByTagName("signing-reason")[0].InnerText;
+            X509Certificate cert = Utility.GetCertificateFromString(certString);
+            return new CertificateModel(cert, tsaTimeString, signingLocalPcTime, signingReason);
         }
     }
 }
