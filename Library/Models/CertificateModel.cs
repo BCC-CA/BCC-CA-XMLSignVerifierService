@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualBasic.CompilerServices;
-using Org.BouncyCastle.X509;
+﻿using Org.BouncyCastle.X509;
 using SinedXmlVelidator.Library;
 using System;
 using XMLSigner.Library;
