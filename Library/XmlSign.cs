@@ -155,8 +155,9 @@ namespace XMLSigner.Library
             string tsaTimeString = document.GetElementsByTagName("Reference")[0].Attributes["Id"].Value;
             string signingLocalPcTime = document.GetElementsByTagName("signing-reason")[0].Attributes["local-time"].Value;
             string signingReason = document.GetElementsByTagName("signing-reason")[0].InnerText;
+            string applicationProvidedIdDuringSignature = document.GetElementsByTagName("Object")[0].Attributes["Id"].Value;
             X509Certificate cert = Utility.GetCertificateFromString(certString);
-            return new CertificateModel(cert, tsaTimeString, signingLocalPcTime, signingReason);
+            return new CertificateModel(cert, tsaTimeString, signingLocalPcTime, signingReason, applicationProvidedIdDuringSignature);
         }
     }
 }
