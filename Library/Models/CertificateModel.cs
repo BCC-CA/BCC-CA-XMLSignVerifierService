@@ -1,7 +1,6 @@
 ﻿using Org.BouncyCastle.X509;
 using SinedXmlVelidator.Library;
 using System;
-using System.ComponentModel.DataAnnotations;
 using XMLSigner.Library;
 
 namespace XmlSigner.Library.Models
@@ -17,7 +16,6 @@ namespace XmlSigner.Library.Models
             CertificateSubject = certificate.SubjectDN.ToString();
             SigningTsaTime = (DateTime)Adapter.Base64DecodTime(tsaTimeString);
             SigningLocalPcTime = Convert.ToDateTime(localPcTimeString);
-            //Convertion To Deployment Server Time - Start
             SigningTsaTime = Utility.GetLocalTimeFromUtcTime(SigningTsaTime);
             SigningLocalPcTime = Utility.GetLocalTimeFromUtcTime(SigningLocalPcTime);
             TsaSignedTimestamp_Base64_UTF8 = tsaTimeString;
