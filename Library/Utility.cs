@@ -6,13 +6,16 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Reflection;
 using System.Xml;
 using XmlSigner.Library.Models;
 using XMLSigner.Library;
 
 namespace SinedXmlVelidator.Library
 {
-    internal enum ClassType
+    [Flags]
+    public enum ClassType
     {
         [Display(Name = "Class 0 Certificate"), Description("2.16.50.1.5.1")]
         Class0 = 0,
@@ -44,6 +47,16 @@ namespace SinedXmlVelidator.Library
                 case "": return ClassType.NotExists;
                 default: return ClassType.NotFound;
             }
+        }
+
+        internal static string GetEnumDisplayName(ClassType classType)
+        {
+            return classType.GetType()
+                  .GetMember(classType.ToString())
+                  .FirstOrDefault()
+                  ?.GetCustomAttribute<DisplayAttribute>(false)
+                  ?.Name
+                  ?? classType.ToString();
         }
 
         [Obsolete]

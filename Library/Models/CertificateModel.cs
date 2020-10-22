@@ -1,6 +1,7 @@
 ﻿using Org.BouncyCastle.X509;
 using SinedXmlVelidator.Library;
 using System;
+using System.ComponentModel.DataAnnotations;
 using XMLSigner.Library;
 
 namespace XmlSigner.Library.Models
@@ -23,21 +24,21 @@ namespace XmlSigner.Library.Models
             CertificateHash = Utility.GetFingureprintFromCertificate(certificate);
             SigningReason = signingReason;
             CertificatePolicyId = Utility.GetCertificatePolicyId(certificate);
-            ClassType = Utility.GetClassTypeFromPolicyId(CertificatePolicyId);
+            ClassType = Utility.GetEnumDisplayName(Utility.GetClassTypeFromPolicyId(CertificatePolicyId));
             ASPProvidedId = serverIdDuringSignature;
         }
 
-        internal string SigningReason { get; }
-        internal string ASPProvidedId { get; }
-        internal string CertificateHash { get; }
-        internal DateTime CertificateValidFrom { get; }
-        internal DateTime CertificateValidTo { get; }
-        internal string CertificateIssuer { get; }
-        internal string CertificateSubject { get; }
-        internal string CertificatePolicyId { get; }
-        internal ClassType ClassType { get; }
-        internal DateTime SigningTsaTime { get; }
-        internal DateTime SigningLocalPcTime { get; }
-        internal string TsaSignedTimestamp_Base64_UTF8 { get; }
+        public string SigningReason { get; }
+        public string ASPProvidedId { get; }
+        public string CertificateHash { get; }
+        public DateTime CertificateValidFrom { get; }
+        public DateTime CertificateValidTo { get; }
+        public string CertificateIssuer { get; }
+        public string CertificateSubject { get; }
+        public string CertificatePolicyId { get; }
+        public string ClassType { get; }
+        public DateTime SigningTsaTime { get; }
+        public DateTime SigningLocalPcTime { get; }
+        public string TsaSignedTimestamp_Base64_UTF8 { get; }
     }
 }
