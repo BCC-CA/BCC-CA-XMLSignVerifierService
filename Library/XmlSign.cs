@@ -98,6 +98,7 @@ namespace XMLSigner.Library
             throw new NotImplementedException();
         }
 
+        [Obsolete]
         internal static List<CertificateModel> GetAllSign(XmlDocument xmlDocument)
         {
             if (!CheckIfDocumentPreviouslySigned(xmlDocument))
@@ -139,6 +140,7 @@ namespace XMLSigner.Library
             return xmlDocument;
         }
 
+        [Obsolete]
         private static CertificateModel GetLastSignerCertificateModel(XmlDocument xmlDocument)
         {
             if (!CheckIfDocumentPreviouslySigned(xmlDocument))

@@ -7,6 +7,7 @@ namespace XmlSigner.Library.Models
 {
     public class CertificateModel
     {
+        [Obsolete]
         public CertificateModel(X509Certificate certificate, string tsaTimeString, string localPcTimeString, string signingReason, string serverIdDuringSignature)
         {
             CertificateValidFrom = certificate.NotBefore;
@@ -18,34 +19,25 @@ namespace XmlSigner.Library.Models
             //Convertion To Deployment Server Time - Start
             SigningTsaTime = Utility.GetLocalTimeFromUtcTime(SigningTsaTime);
             SigningLocalPcTime = Utility.GetLocalTimeFromUtcTime(SigningLocalPcTime);
-            //Convertion To Deployment Server Time - End
             TsaSignedTimestamp_Base64_UTF8 = tsaTimeString;
-            CertificateHash = GetFingureprintFromCertificate(certificate);
+            CertificateHash = Utility.GetFingureprintFromCertificate(certificate);
             SigningReason = signingReason;
+            CertificatePolicyId = Utility.GetCertificatePolicyId(certificate);
+            ClassType = Utility.GetClassTypeFromPolicyId(CertificatePolicyId);
             ASPProvidedId = serverIdDuringSignature;
         }
 
-        private string GetFingureprintFromCertificate(X509Certificate certificate)
-        {
-            byte[] derEncodedCert = certificate.GetEncoded();
-            byte[] hash;
-            using (var md5 = System.Security.Cryptography.MD5.Create())
-            {
-                md5.TransformFinalBlock(derEncodedCert, 0, derEncodedCert.Length);
-                hash = md5.Hash;
-            }
-            return Convert.ToBase64String(hash);
-        }
-
-        public string SigningReason { get; }
-        public string ASPProvidedId { get; }
-        public string CertificateHash { get; }
-        public DateTime CertificateValidFrom { get; }
-        public DateTime CertificateValidTo { get; }
-        public string CertificateIssuer { get; }
-        public string CertificateSubject { get; }
-        public DateTime SigningTsaTime { get; }
-        public DateTime SigningLocalPcTime { get; }
-        public string TsaSignedTimestamp_Base64_UTF8 { get; }
+        internal string SigningReason { get; }
+        internal string ASPProvidedId { get; }
+        internal string CertificateHash { get; }
+        internal DateTime CertificateValidFrom { get; }
+        internal DateTime CertificateValidTo { get; }
+        internal string CertificateIssuer { get; }
+        internal string CertificateSubject { get; }
+        internal string CertificatePolicyId { get; }
+        internal ClassType ClassType { get; }
+        internal DateTime SigningTsaTime { get; }
+        internal DateTime SigningLocalPcTime { get; }
+        internal string TsaSignedTimestamp_Base64_UTF8 { get; }
     }
 }
