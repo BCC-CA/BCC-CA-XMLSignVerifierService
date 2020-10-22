@@ -43,9 +43,9 @@ namespace SinedXmlVelidator.Library
                 case "2.16.50.1.2.1": return ClassType.Class1;
                 case "2.16.50.1.2.2": return ClassType.Class2;
                 case "2.16.50.1.2.3": return ClassType.Class3;
-                case null: return ClassType.NotExists;
-                case "": return ClassType.NotExists;
-                default: return ClassType.NotFound;
+                case null: return ClassType.NotFound;
+                case "": return ClassType.NotFound;
+                default: return ClassType.NotExists;
             }
         }
 
