@@ -2,14 +2,15 @@
 using System.IO;
 using System.Net;
 using System.Collections;
+using System.Collections.Generic;
 /*Bouncy castle*/
 using Org.BouncyCastle.Ocsp;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Asn1.X509;
 using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.Ocsp;
+
 using X509Certificate = Org.BouncyCastle.X509.X509Certificate;
-using System.Collections.Generic;
 using X509Extension = Org.BouncyCastle.Asn1.X509.X509Extension;
 
 namespace SinedXmlVelidator.Library
