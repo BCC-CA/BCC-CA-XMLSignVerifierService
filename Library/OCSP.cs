@@ -23,10 +23,10 @@ namespace SinedXmlVelidator.Library
 
     public class OCSP
     {
-        private readonly int BufferSize = 4096 * 8;
-        private readonly int MaxClockSkew = 36000000;
+        private static readonly int BufferSize = 4096 * 8;
+        private static readonly int MaxClockSkew = 36000000;
 
-        internal OCSPStatus CheckOCSP(X509Certificate eeCert, X509Certificate issuerCert)
+        internal static OCSPStatus CheckOCSP(X509Certificate eeCert, X509Certificate issuerCert)
         {
             //var a = eeCert.Issu
             // Query the first Ocsp Url found in certificate
@@ -44,10 +44,12 @@ namespace SinedXmlVelidator.Library
 
             byte[] binaryResp = PostData(url, req.GetEncoded(), "application/ocsp-request", "application/ocsp-response");
 
-            return ProcessOcspResponse(eeCert, issuerCert, binaryResp);
+            return ProcessOcspResponse(eeCert,
+                                       issuerCert,
+                                       binaryResp);
         }
 
-        private byte[] PostData(string url, byte[] data, string contentType, string accept)
+        private static byte[] PostData(string url, byte[] data, string contentType, string accept)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = "POST";
@@ -65,7 +67,7 @@ namespace SinedXmlVelidator.Library
             return resp;
         }
 
-        private byte[] ToByteArray(Stream stream)
+        private static byte[] ToByteArray(Stream stream)
         {
             byte[] buffer = new byte[BufferSize];
             MemoryStream ms = new MemoryStream();
@@ -140,7 +142,7 @@ namespace SinedXmlVelidator.Library
             return aIn.ReadObject();
         }
 
-        private OCSPStatus ProcessOcspResponse(X509Certificate eeCert, X509Certificate issuerCert, byte[] binaryResp)
+        private static OCSPStatus ProcessOcspResponse(X509Certificate eeCert, X509Certificate issuerCert, byte[] binaryResp)
         {
             OcspResp r = new OcspResp(binaryResp);
             OCSPStatus cStatus = OCSPStatus.Unknown;
@@ -192,7 +194,7 @@ namespace SinedXmlVelidator.Library
         //3. The identity of the signer matches the intended recipient of the
         //request.
         //4. The signer is currently authorized to sign the response.
-        private void ValidateSignerAuthorization(X509Certificate issuerCert, X509Certificate signerCert)
+        private static void ValidateSignerAuthorization(X509Certificate issuerCert, X509Certificate signerCert)
         {
             // This code just check if the signer certificate is the same that issued the ee certificate
             // See RFC 2560 for more information
@@ -203,7 +205,7 @@ namespace SinedXmlVelidator.Library
         }
 
         //2. The signature on the response is valid;
-        private void ValidateResponseSignature(BasicOcspResp or, Org.BouncyCastle.Crypto.AsymmetricKeyParameter asymmetricKeyParameter)
+        private static void ValidateResponseSignature(BasicOcspResp or, Org.BouncyCastle.Crypto.AsymmetricKeyParameter asymmetricKeyParameter)
         {
             if (!or.Verify(asymmetricKeyParameter))
             {
@@ -234,7 +236,7 @@ namespace SinedXmlVelidator.Library
 
         //1. The certificate identified in a received response corresponds to
         //that which was identified in the corresponding request;
-        private void ValidateCertificateId(X509Certificate issuerCert, X509Certificate eeCert, CertificateID certificateId)
+        private static void ValidateCertificateId(X509Certificate issuerCert, X509Certificate eeCert, CertificateID certificateId)
         {
             CertificateID expectedId = new CertificateID(CertificateID.HashSha1, issuerCert, eeCert.SerialNumber);
 
@@ -249,13 +251,13 @@ namespace SinedXmlVelidator.Library
 
         }
 
-        private OcspReq GenerateOcspRequest(X509Certificate issuerCert, BigInteger serialNumber)
+        private static OcspReq GenerateOcspRequest(X509Certificate issuerCert, BigInteger serialNumber)
         {
             CertificateID id = new CertificateID(CertificateID.HashSha1, issuerCert, serialNumber);
             return GenerateOcspRequest(id);
         }
 
-        private OcspReq GenerateOcspRequest(CertificateID id)
+        private static OcspReq GenerateOcspRequest(CertificateID id)
         {
             OcspReqGenerator ocspRequestGenerator = new OcspReqGenerator();
 

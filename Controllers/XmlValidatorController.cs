@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SinedXmlVelidator.Library;
+using SinedXmlVelidator.Test;
 using XmlSigner.Library.Models;
 using XMLSigner.Library;
 
@@ -27,6 +28,7 @@ namespace SinedXmlVelidator.Controllers
         public ActionResult Get()
         {
             _logger.LogDebug("Application Home Page Accessed");
+            //var a = OCSPTest.Test();
             return Ok(new {
                 status = "XML Signature Verifier Is Running",
                 currentTime = DateTime.UtcNow,
@@ -35,6 +37,7 @@ namespace SinedXmlVelidator.Controllers
         }
 
         [HttpPost("verify_file")]
+        [Obsolete]
         public async Task<ActionResult<SignedXmlModel>> VerifyFile([FromForm]IFormFile file)    //XmlFile xmlFile
         {
             if (file?.Length > 0)
@@ -61,6 +64,7 @@ namespace SinedXmlVelidator.Controllers
         }
 
         [HttpPost("verify_string")]
+        [Obsolete]
         public ActionResult<SignedXmlModel> VerifyXmlString([FromForm] string xml)
         {
             //string xml = Request.Form["xml"];

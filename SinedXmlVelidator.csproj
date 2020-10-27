@@ -3,6 +3,12 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Test\Cert\**" />
+    <Content Remove="Test\Cert\**" />
+    <EmbeddedResource Remove="Test\Cert\**" />
+    <None Remove="Test\Cert\**" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove=".gitignore" />
   </ItemGroup>
   <ItemGroup>

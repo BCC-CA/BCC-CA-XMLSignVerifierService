@@ -1,0 +1,1 @@
+cd C:\Users\abrar\Desktop\BCC-CA-XMLSignVerifierService\Test\CertCommand\; openssl ocsp -issuer issuer.pem -cert c.pem -text -url http://ocsp.sectigo.com; cd ~
