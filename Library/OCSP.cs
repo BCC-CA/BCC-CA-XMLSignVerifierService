@@ -26,7 +26,7 @@ namespace SinedXmlVelidator.Library
         private readonly int BufferSize = 4096 * 8;
         private readonly int MaxClockSkew = 36000000;
 
-        public OCSPStatus CheckOCSP(X509Certificate eeCert, X509Certificate issuerCert)
+        internal OCSPStatus CheckOCSP(X509Certificate eeCert, X509Certificate issuerCert)
         {
             //var a = eeCert.Issu
             // Query the first Ocsp Url found in certificate
@@ -47,7 +47,7 @@ namespace SinedXmlVelidator.Library
             return ProcessOcspResponse(eeCert, issuerCert, binaryResp);
         }
 
-        public byte[] PostData(string url, byte[] data, string contentType, string accept)
+        private byte[] PostData(string url, byte[] data, string contentType, string accept)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = "POST";
@@ -65,7 +65,7 @@ namespace SinedXmlVelidator.Library
             return resp;
         }
 
-        public byte[] ToByteArray(Stream stream)
+        private byte[] ToByteArray(Stream stream)
         {
             byte[] buffer = new byte[BufferSize];
             MemoryStream ms = new MemoryStream();
@@ -80,7 +80,7 @@ namespace SinedXmlVelidator.Library
             return ms.ToArray();
         }
 
-        public static List<string> GetAuthorityInformationAccessOcspUrl(X509Certificate cert)
+        private static List<string> GetAuthorityInformationAccessOcspUrl(X509Certificate cert)
         {
             List<string> ocspUrls = new List<string>();
 
@@ -183,7 +183,7 @@ namespace SinedXmlVelidator.Library
             return cStatus;
         }
 
-        private void ValidateResponse(BasicOcspResp or, X509Certificate issuerCert)
+        internal void ValidateResponse(BasicOcspResp or, X509Certificate issuerCert)
         {
             ValidateResponseSignature(or, issuerCert.GetPublicKey());
             ValidateSignerAuthorization(issuerCert, or.GetCerts()[0]);
@@ -224,7 +224,7 @@ namespace SinedXmlVelidator.Library
 
         //5. The time at which the status being indicated is known to be
         //correct (thisUpdate) is sufficiently recent.
-        private void ValidateThisUpdate(SingleResp resp)
+        protected void ValidateThisUpdate(SingleResp resp)
         {
             if (Math.Abs(resp.ThisUpdate.Ticks - DateTime.Now.Ticks) > MaxClockSkew)
             {
@@ -242,7 +242,6 @@ namespace SinedXmlVelidator.Library
             {
                 throw new Exception("Invalid certificate ID in response");
             }
-
             if (!Org.BouncyCastle.Utilities.Arrays.AreEqual(expectedId.GetIssuerNameHash(), certificateId.GetIssuerNameHash()))
             {
                 throw new Exception("Invalid certificate Issuer in response");
