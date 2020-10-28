@@ -28,7 +28,7 @@ namespace SinedXmlVelidator.Controllers
         public ActionResult Get()
         {
             _logger.LogDebug("Application Home Page Accessed");
-            //var a = OCSPTest.Test();
+            //OCSPStatus ocspCertCheckStatus = OCSPTest.Test();
             return Ok(new {
                 status = "XML Signature Verifier Is Running",
                 currentTime = DateTime.UtcNow,
